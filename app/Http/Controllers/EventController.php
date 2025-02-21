@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -13,7 +14,7 @@ class EventController extends Controller
     public function index()
     {
         
-        $events = Event::all(); 
+        $events = Event::where('user_id', auth()->user()->id)->get(); 
         return view('events.index', compact('events'));
     }
 
@@ -22,7 +23,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return view('events.create');
     }
 
     /**
@@ -30,7 +31,30 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_time'  => 'required|date_format:H:i',
+            'end_time'    => 'required|date_format:H:i',
+            'capacity'    => 'required|integer|min:1',
+        ]);
+
+        try{
+
+            $event = Event::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'capacity' => $request->capacity,
+            ]);
+    
+            return redirect()->route('events.index')->with('success', 'Event Created Successfully!');
+        } catch(\Exception $e){
+            Log::error('Error creating event'. $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Something went wrong! Please try again.');
+        }
+        
     }
 
     /**
@@ -44,24 +68,55 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Event $event)
     {
-        //
+        // dd($event);
+
+        return view('events.edit', compact('event'));
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Event $event)
     {
-        //
+       
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_time'  => 'required|date_format:H:i',
+            'end_time'    => 'required|date_format:H:i|after:start_time',
+            'capacity'    => 'required|integer|min:1',
+        ]);
+
+        try {
+          
+            $event->update([
+                'title'       => $request->title,
+                'description' => $request->description,
+                'start_time'  => $request->start_time,
+                'end_time'    => $request->end_time,
+                'capacity'    => $request->capacity,
+            ]);
+
+            return redirect()->route('events.index')->with('success', 'Event Updated Successfully!');
+        } catch (\Exception $e) {
+             
+            Log::error('Error updating event: ' . $e->getMessage());
+
+             return redirect()->back()->withInput()->with('error', 'Something went wrong! Please try again.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        
+        // dd($event);
+        $event->delete();
+        return redirect()->route('events.index')->with('success', 'Event Deleted Successfully!');
     }
 }

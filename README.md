@@ -79,19 +79,7 @@ Laravel Breeze provides authentication out of the box. You can access the follow
 - **Login**: `/login`
 - **Register**: `/register`
 - **Dashboard (after login)**: `/dashboard`
-
-## Additional Commands
-
-### Running Tests
-```bash
-php artisan test
-```
  
-
-## License
-This project is open-source and available under the [MIT License](LICENSE).
-
----
 
 ### 🎉 You’re all set!
 Now you can start building your Multi-Tenant Event Management System with Breeze authentication. If you face any issues, check the Laravel documentation or open an issue in this repository.

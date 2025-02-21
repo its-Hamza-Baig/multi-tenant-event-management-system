@@ -71,14 +71,7 @@ php artisan db:seed
 php artisan serve
 ```
 Visit **http://127.0.0.1:8000** in your browser to view the project.
-
-## Multi-Tenancy Setup
-This project supports multi-tenancy to allow different organizations to manage their own events. Tenants are stored in a `tenants` table and each tenant has its own events and users.
-
-To create a new tenant, run:
-```bash
-php artisan tenant:create {tenant_name}
-```
+ 
 
 ## Authentication
 Laravel Breeze provides authentication out of the box. You can access the following routes:

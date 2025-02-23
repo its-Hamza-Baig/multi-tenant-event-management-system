@@ -13,11 +13,17 @@ class Event extends Model
         'description',
         'start_time',
         'end_time',
-        'capacity'
+        'capacity', 'event_type', 'price'
     ];
     protected $casts = [
         'start_time' => 'datetime',
         'end_time'   => 'datetime',
         'capacity'   => 'integer',
     ];
+
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

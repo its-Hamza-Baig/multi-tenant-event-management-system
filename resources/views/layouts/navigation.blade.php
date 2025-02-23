@@ -20,16 +20,34 @@
                 </div>
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.index')">
-                        {{ __('Events') }}
+                    <x-nav-link :href="route('subscription-plans.index')" :active="request()->routeIs('subscription-plans.index')">
+                        {{ __('Subscription Plans') }}
                     </x-nav-link>
                 </div>
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('events.create')" :active="request()->routeIs('events.create')">
-                        {{ __('Create Events') }}
+                    <x-nav-link :href="route('subscription-plans.create')" :active="request()->routeIs('subscription-plans.create')">
+                        {{ __('Create New Plan') }}
                     </x-nav-link>
                 </div>
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('tenants.index')" :active="request()->routeIs('tenants.index')">
+                        {{ __('Tenants') }}
+                    </x-nav-link>
+                </div>
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('payment-settings.index')" :active="request()->routeIs('payment-settings.index')">
+                        {{ __('Payment Method Settings') }}
+                    </x-nav-link>
+                </div>
+                <!-- Navigation Links -->
+                {{-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('payment-settings.update')" :active="request()->routeIs('payment-settings.update')">
+                        {{ __('Add Payment Method Settings') }}
+                    </x-nav-link>
+                </div> --}}
             </div>
 
             <!-- Settings Dropdown -->

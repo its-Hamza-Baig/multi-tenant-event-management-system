@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-tenant-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Events') }}
@@ -13,7 +13,7 @@
                     <section class="space-y-12">
                         <x-table 
                             :table-classes="'table table-bordered table-hover w-full'"   
-                            :headers="['Title', 'Description', 'Start Time', 'End Time', 'Capacity', 'Action']" 
+                            :headers="['Title', 'Description', 'Start Time', 'End Time', 'Capacity', 'Booked', 'Available', 'Entry Type', 'Price', 'Action']" 
                             :rows="$events"
                         />
                     </section>
@@ -22,4 +22,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-tenant-app-layout>

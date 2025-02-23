@@ -92,6 +92,13 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        'central' => [  
+            'driver'    => 'mysql',
+            'host'      => env('DB_MAIN_HOST'),
+            'database'  => env('DB_MAIN_DATABASE'),
+            'username'  => env('DB_MAIN_USERNAME'),
+            'password'  => env('DB_MAIN_PASSWORD'),
+        ],
 
     ],
 

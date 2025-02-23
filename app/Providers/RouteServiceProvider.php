@@ -28,13 +28,36 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
-
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+        $centralDomains = $this->centralDomains();
+        // dd($centralDomains);
+        $this->routes(function () use($centralDomains) {
+            if ($this->isCentralDomain(request()->getHost(), $centralDomains)) {
+                
+                foreach ($centralDomains as $domain) {
+                    Route::middleware('api')
+                        ->prefix('api')
+                        ->domain($domain)
+                        ->group(base_path('routes/api.php'));
+    
+                    Route::middleware('web')
+                        ->domain($domain)
+                        ->group(base_path('routes/web.php'));
+                }
+            } else {
+                // Tenant Users Access These Routes
+                Route::middleware('web')
+                    ->domain(request()->getHost()) // Any tenant domain
+                    ->group(base_path('routes/tenant.php')); 
+            }
         });
+    }
+
+    protected function isCentralDomain($currentDomain, array $centralDomains): bool
+    {
+        return in_array($currentDomain, $centralDomains);
+    }
+    protected function centralDomains(): array 
+    {
+        return config('tenancy.central_domains', []);
     }
 }

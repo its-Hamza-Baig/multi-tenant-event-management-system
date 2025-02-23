@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->id(); 
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
-            $table->integer('capacity')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('capacity')->nullable(); 
+            $table->string('event_type')->nullable(); 
+            $table->integer('price')->nullable();  
+            
             $table->timestamps();
         });
     }

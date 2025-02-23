@@ -40,21 +40,29 @@
                                 </li> 
                             @endauth
                         @endif
+                        <li class="nav-item">
+                            <a href="{{ route('tenant.register') }}" class="nav-link">Register Your Organization</a>
+                        </li>
                     </ul> 
                 </div>
                 </div>
             </nav>
-            <div class="row mt-5">
-                @forelse ($data as $item)
+            {{-- <div class="row mt-5">
+                @forelse ($plans as $plan)
                     
                     <div class="col-3">
                         <div class="card" style="width: 18rem;">
                             <div class="card-body">
-                                <h5 class="card-title">{{ $item->title }}</h5> 
-                                <p class="card-text">{{ $item->description }}</p>
-                                <p class="card-subtitle mb-2 text-body-secondary">Start Time : {{ Carbon\Carbon::parse($item->start_time)->format('H:i A') }}</p>
-                                <p class="card-subtitle mb-2 text-body-secondary">End Time : {{ Carbon\Carbon::parse($item->end_time)->format('H:i A') }}</p> 
-                                <a href="{{ route('book.event') }}">Book Event</a>
+                                <h5 class="card-title">{{ $plan->name }}</h5> 
+                               
+                                <ul>
+                                    <li>Price : {{ $plan->price }}</li>
+                                    <li>Event Limit : {{ $plan->event_limit }}</li>
+                                    <li>Attendee Limit : {{ $plan->attendee_limit }}</li>
+                                    <li>Seat Maps : {{ $plan->seat_maps }}</li>
+                                    <li>Discount Codes : {{ $plan->discount_codes }}</li> 
+                                </ul>
+                                <a href="{{ route('tenant.register', ['plan_id' => $plan->id]) }}" class="btn btn-sm btn-info">Subscribe</a>
                             </div>
                         </div>
                     </div>
@@ -62,7 +70,7 @@
                 @empty
                     
                 @endforelse
-            </div>
+            </div> --}}
         </div>
             
 

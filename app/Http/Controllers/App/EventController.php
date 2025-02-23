@@ -1,29 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\App;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class EventController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         
-        $events = Event::where('user_id', auth()->user()->id)->get(); 
-        return view('events.index', compact('events'));
+        $events = Event::with('bookings')->get(); 
+        return view('app.events.index', compact('events'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        return view('events.create');
+    { 
+        $subscription = tenant()->subscription;
+        $attendeeLimit = $subscription ? $subscription->plan->attendee_limit : 100;
+        return view('app.events.create', compact('attendeeLimit'));
     }
 
     /**
@@ -37,6 +40,8 @@ class EventController extends Controller
             'start_time'  => 'required|date_format:H:i',
             'end_time'    => 'required|date_format:H:i',
             'capacity'    => 'required|integer|min:1',
+            'event_type' => 'required|in:free,paid',
+            'price' => 'nullable|required_if:event_type,paid|numeric|min:0',
         ]);
 
         try{
@@ -47,6 +52,8 @@ class EventController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'capacity' => $request->capacity,
+                'event_type' => $request->event_type,
+                'price' => $request->event_type === 'paid' ? $request->price : 0,
             ]);
     
             return redirect()->route('events.index')->with('success', 'Event Created Successfully!');
@@ -72,7 +79,7 @@ class EventController extends Controller
     {
         // dd($event);
 
-        return view('events.edit', compact('event'));
+        return view('app.events.edit', compact('event'));
         
     }
 
@@ -86,7 +93,7 @@ class EventController extends Controller
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
             'start_time'  => 'required|date_format:H:i',
-            'end_time'    => 'required|date_format:H:i|after:start_time',
+            'end_time'    => 'required|date_format:H:i',
             'capacity'    => 'required|integer|min:1',
         ]);
 

@@ -56,6 +56,9 @@ Route::middleware([
             Route::get('/plans', [SubscriptionPlanController::class, 'index'])->name('plan');
             Route::get('/subscribe-plans/{id}', [SubscriptionPlanController::class, 'subscribe'])->name('subscribe.plan');
             Route::post('/checkout/process', [SubscriptionPlanController::class, 'processPayment'])->name('checkout.process');
+
+            Route::get('/view-bookings/{id}', [EventController::class, 'viewBooking'])->name('view.booking');
+
         });
 
 

@@ -25,7 +25,7 @@
                 <td>{{ $row->event_type }}</td>
                 <td>{{ $row->price ? '$' : '' }} {{ $row->price }}</td>
                 <td>
-                    <a href="{{ route('events.edit', $row->id) }}" class="btn btn-sm btn-info">View Bookings</a>
+                    <a href="{{ route('view.booking', $row->id) }}" class="btn btn-sm btn-info">View Bookings</a>
                     <a href="{{ route('events.edit', $row->id) }}" class="btn btn-sm btn-primary">Edit</a>
                     <form action="{{ route('events.destroy', $row->id) }}" method="POST">
                         @csrf

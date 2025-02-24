@@ -89,4 +89,10 @@ class EventController extends Controller
             return redirect()->back()->withInput()->with('error', 'Something went wrong! Please try again.');
         }
     }
+
+    public function viewBooking($id)
+    {
+        $data = Event::with('bookings.user')->find($id);
+        return view('app.events.view_bookings', compact('data'));
+    }
 }

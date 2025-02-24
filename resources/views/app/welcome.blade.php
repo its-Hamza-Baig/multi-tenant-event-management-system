@@ -96,8 +96,8 @@
                         <div class="event-card p-4">
                             <h4 class="card-title">{{ $item->title }}</h4>
                             <p>{{ $item->description }}</p>
-                            <p><strong>Start Time:</strong> {{ $item->start_time }}</p>
-                            <p><strong>End Time:</strong> {{ $item->end_time }}</p>
+                            <p><strong>Start Time:</strong> {{ Carbon\Carbon::parse($item->start_time)->format('Y m d h:i A') }}</p>
+                            <p><strong>End Time:</strong>  {{ Carbon\Carbon::parse($item->end_time)->format('Y m d h:i A') }}</p>
                             <p><strong>Capacity:</strong> {{ $item->capacity }}</p>
                             <div class="card-footer text-center">
                                 @if($item->price)

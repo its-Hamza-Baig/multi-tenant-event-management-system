@@ -50,11 +50,11 @@ The following packages are used in this project:
 Follow these steps to set up the project:
 1. Clone the repository:
    ```sh
-   git clone <repository-url>
+   git clone https://github.com/its-Hamza-Baig/multi-tenant-event-management-system.git
    ```
 2. Navigate to the project directory:
    ```sh
-   cd multi-tenancy-event-system
+   cd multi-tenant-event-management-system
    ```
 3. Install dependencies:
    ```sh
@@ -74,15 +74,16 @@ Follow these steps to set up the project:
    ```sh
    php artisan serve
    ```
-7. Add these line and add the main database connection in it
 
-
-DB_MAIN_CONNECTION=mysql
-DB_MAIN_HOST=127.0.0.1
-DB_MAIN_PORT=3306
-DB_MAIN_DATABASE=multi_tenant_event_management_system
-DB_MAIN_USERNAME=root
-DB_MAIN_PASSWORD=
+7. Add these lines and add the main database connection in it:
+   ```sh
+   DB_MAIN_CONNECTION=mysql
+   DB_MAIN_HOST=127.0.0.1
+   DB_MAIN_PORT=3306
+   DB_MAIN_DATABASE=multi_tenant_event_management_system
+   DB_MAIN_USERNAME=root
+   DB_MAIN_PASSWORD=
+   ```
 
 ## Flow Chart Diagram
 ![Image](https://github.com/user-attachments/assets/491c70b4-4b87-41e4-8f6b-0a72ba396993)

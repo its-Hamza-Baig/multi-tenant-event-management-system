@@ -86,7 +86,7 @@ class BookingController extends Controller
 
     public function myBookings()
     {
-        $data = Booking::with('event')->where('user_id', auth()->id)->get();
+        $data = Booking::with('event')->where('user_id', auth()->user()->id)->get();
         return view('app.booking.index', compact('data'));
     }
 

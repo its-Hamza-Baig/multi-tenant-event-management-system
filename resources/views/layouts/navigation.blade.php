@@ -38,7 +38,7 @@
                 </div>
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('payment-settings.index')" :active="request()->routeIs('payment-settings.index')">
+                    <x-nav-link :href="route('payment.settings.index')" :active="request()->routeIs('payment.settings.index')">
                         {{ __('Payment Method Settings') }}
                     </x-nav-link>
                 </div>

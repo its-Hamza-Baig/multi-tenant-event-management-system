@@ -22,32 +22,41 @@
                                 
                                 <div class="mb-3">
                                     <x-input-label for="description" :value="__('Description')" />
-                                    <x-textarea id="description" name="description" class="mt-1 block w-full"  required   />
-                                    <x-input-error class="mt-2" :messages="$errors->get('title')" />
-
+                                    <x-textarea id="description" name="description" class="mt-1 block w-full" required />
+                                    <x-input-error class="mt-2" :messages="$errors->get('description')" />
                                 </div>
 
                                 <div class="mb-3">
                                     <x-input-label for="start_time" :value="__('Start Time')" />
-                                    <x-text-input id="start_time" name="start_time" type="time" class="mt-1 block w-full" :value="old('start_time')" required autofocus   />
+                                    <x-text-input id="start_time" name="start_time" type="time" class="mt-1 block w-full" :value="old('start_time')" required />
                                     <x-input-error class="mt-2" :messages="$errors->get('start_time')" />
                                 </div>
                                 
-
                                 <div class="mb-3">
                                     <x-input-label for="end_time" :value="__('End Time')" />
-                                    <x-text-input id="end_time" name="end_time" type="time" class="mt-1 block w-full" :value="old('end_time')" required autofocus   />
+                                    <x-text-input id="end_time" name="end_time" type="time" class="mt-1 block w-full" :value="old('end_time')" required />
                                     <x-input-error class="mt-2" :messages="$errors->get('end_time')" />
                                 </div>
                                 
                                 <div class="mb-3">
                                     <x-input-label for="capacity" :value="__('Capacity')" />
-                                    <x-text-input id="capacity" name="capacity" type="number" class="mt-1 block w-full" :value="old('capacity')" max="{{ $attendeeLimit }}" required autofocus   />
+                                    <x-text-input id="capacity" name="capacity" type="number" class="mt-1 block w-full" :value="old('capacity')" max="{{ $attendeeLimit }}" required />
                                     <x-input-error class="mt-2" :messages="$errors->get('capacity')" />
                                 </div>
-
-
-                                <!-- Event Type Selection -->
+                                @if(tenant()->subscription->plan->seat_maps)
+                                                
+                                    <div class="mb-6">
+                                        <x-input-label :value="__('Seat Map')" />
+                                        <div id="seat-map" class="grid grid-cols-5 gap-2 p-4 border border-gray-300 rounded-lg">
+                                            <!-- Seats will be generated here -->
+                                        </div>
+                                        <button type="button" id="add-seat" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Add Seat</button>
+                                        <input type="hidden" name="seat_map" id="seat_map_data">
+                                    </div>
+                                @else
+                                    <p class="text-red-500">Upgrade your plan to create a seat map.</p>
+                                @endif
+                                
                                 <div class="mb-3">
                                     <x-input-label :value="__('Event Type')" />
                                     <div class="flex gap-4 mt-2">
@@ -61,49 +70,50 @@
                                         </label>
                                     </div>
                                 </div>
-
-                                <!-- Price Field (Only Visible if Paid is Selected) -->
+                                
                                 <div class="mb-3 hidden" id="price_field">
                                     <x-input-label for="price" :value="__('Event Price (USD)')" />
                                     <x-text-input id="price" name="price" type="number" class="mt-1 block w-full" :value="old('price')" step="0.01" min="0" />
                                     <x-input-error class="mt-2" :messages="$errors->get('price')" />
                                 </div>
-
-
+                                
+                                <div class="mb-3 hidden" id="discount_field">
+                                    <x-input-label for="discount" :value="__('Discount (%)')" />
+                                    <x-text-input id="discount" name="discount" type="number" class="mt-1 block w-full" :value="old('discount')" step="0.01" min="0" max="100" />
+                                </div>
+                                
                                 <div class="flex items-center gap-4">
-
                                     <x-primary-button>{{ __('Save') }}</x-primary-button>
                                 </div>
-
                              </form>
                         </div>
                     </div>
-                    
                 </div>
             </div>
- 
         </div>
     </div>
 
-<!-- JavaScript to Show/Hide Price Field -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const freeRadio = document.getElementById('event_free');
-        const paidRadio = document.getElementById('event_paid');
-        const priceField = document.getElementById('price_field');
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const priceField = document.getElementById('price_field');
+            document.getElementById('event_paid').addEventListener('change', () => priceField.classList.remove('hidden'));
+            document.getElementById('event_free').addEventListener('change', () => priceField.classList.add('hidden'));
+            
+            const seatMap = document.getElementById('seat-map');
+            const seatData = document.getElementById('seat_map_data');
+            document.getElementById('add-seat').addEventListener('click', () => {
+                const seat = document.createElement('div');
+                seat.classList.add('p-3', 'bg-gray-200', 'rounded', 'text-center', 'cursor-pointer');
+                seat.textContent = `S${seatMap.children.length + 1}`;
+                seat.addEventListener('click', () => seat.remove());
+                seatMap.appendChild(seat);
+                updateSeatData();
+            });
 
-        function togglePriceField() {
-            if (paidRadio.checked) {
-                priceField.classList.remove('hidden');
-            } else {
-                priceField.classList.add('hidden');
+            function updateSeatData() {
+                const seats = Array.from(seatMap.children).map(seat => seat.textContent);
+                seatData.value = JSON.stringify(seats);
             }
-        }
-
-        freeRadio.addEventListener('change', togglePriceField);
-        paidRadio.addEventListener('change', togglePriceField);
-
-        togglePriceField(); // Initial check
-    });
-</script>
+        });
+    </script>
 </x-tenant-app-layout>

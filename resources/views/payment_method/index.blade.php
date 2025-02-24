@@ -10,7 +10,7 @@
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="w-full"> 
                     
-                    <form action="{{ route('payment-settings.update') }}" method="POST">
+                    <form action="{{ route('payment.settings.update') }}" method="POST">
                         @csrf
                         @method('PUT')
                     

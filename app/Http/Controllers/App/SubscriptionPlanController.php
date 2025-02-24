@@ -22,12 +22,12 @@ class SubscriptionPlanController extends Controller
     public function subscribe($id)
     {
 
-        $keys = PaymentSetting::on('central')->first();
-        if($id){
-            $plan = DB::connection('central')->table('subscription_plans')->where('id', $id)
-            ->first();
+        $keys = $this->getPaymentSettings();
+        $plan = $this->getPlanById($id);
 
-        }
+
+        // $keys = PaymentSetting::on('central')->first();
+ 
         // dd($keys);
         return view('app.plans.subscribe', compact('plan','keys'));
     }
@@ -35,57 +35,75 @@ class SubscriptionPlanController extends Controller
    
     public function processPayment(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'stripeToken' => 'required',
-            'plan_id' => 'required'
+            'plan_id' => 'required|integer'
         ]);
+ 
+        $paymentSettings = $this->getPaymentSettings();
+        $plan = $this->getPlanById($validated['plan_id']);
 
-        // Fetch Stripe keys from the central database
-        $paymentSettings = DB::connection('central')->table('payment_settings')->first();
-        if (!$paymentSettings) {
-            return redirect()->back()->with('error', 'Payment settings not configured.');
-        }
-
-        Stripe::setApiKey($paymentSettings->stripe_secret_key);
-
-        // Fetch the selected plan details
-        $plan = DB::connection('central')->table('subscription_plans')->where('id', $request->plan_id)->first();
-        if (!$plan) {
-            return redirect()->back()->with('error', 'Plan not found.');
-        }
-
+ 
         try {
+            Stripe::setApiKey($paymentSettings->stripe_secret_key);
+
             $charge = Charge::create([
-                'amount' => $plan->price * 100, // Convert to cents
+                'amount' => $plan->price * 100,  
                 'currency' => 'usd',
                 'source' => $request->stripeToken,
                 'description' => "Subscription for {$plan->name}",
             ]);
-
-
-            // Store the subscription in the tenant database
-            DB::table('subscriptions')->insert([
-                'tenant_id' => tenant()->id,
-                'plan_id' => $plan->id,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            // Store the subscription in the central database (for super admin tracking)
-            DB::connection('central')->table('tenant_subscriptions')->updateOrInsert(
-                ['tenant_id' => tenant()->id],
-                [
-                    'plan_id' => $plan->id,
-                    'status' => 'active',
-                    'subscribed_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
-
+            $this->storeSubscription($plan->id);
+ 
             return redirect()->route('dashboard')->with('success', 'Payment successful! Subscription activated.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Payment failed: ' . $e->getMessage());
         }
+    }
+
+
+
+    private function getPaymentSettings()
+    {
+        $settings = DB::connection('central')->table('payment_settings')->first();
+        abort_if(!$settings, 500, 'Payment settings not configured.');
+        
+        return $settings;
+    }
+
+     
+    private function getPlanById($id)
+    {
+        $plan = DB::connection('central')->table('subscription_plans')->find($id);
+        abort_if(!$plan, 404, 'Plan not found.');
+
+        return $plan;
+    }
+
+
+    private function storeSubscription($planId)
+    {
+        $tenantId = tenant()->id;
+ 
+        DB::table('subscriptions')->updateOrInsert(
+            ['tenant_id' => $tenantId],
+            [
+                'tenant_id'  => $tenantId,
+                'plan_id'    => $planId,
+                'status'     => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        DB::connection('central')->table('tenant_subscriptions')->updateOrInsert(
+            ['tenant_id' => $tenantId],
+            [
+                'plan_id'       => $planId,
+                'status'        => 'active',
+                'subscribed_at' => now(),
+                'updated_at'    => now(),
+            ]
+        );
     }
 }

@@ -16,14 +16,10 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::check()){
-            if(Auth::user()->role == 'admin'){
-                return $next($request);
-
-            }else{
-                Auth::logout();
-                return redirect()->route('home')->with('error', 'You are not authorized to access this page.');
-            }
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            Auth::logout();
+            return redirect()->route('home')->with('error', 'You are not authorized to access this page.');
         }
+        return $next($request);
     }
 }

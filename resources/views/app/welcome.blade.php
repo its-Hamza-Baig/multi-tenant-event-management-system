@@ -1,83 +1,149 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Laravel</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>        
-        <!-- Styles -->
-        
-    </head>
-    <body>
-        <div class="container-fluid">
-
-            <nav class="navbar navbar-expand-lg bg-body-tertiary">
-                <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    
-                        @if (Route::has('login'))
-                            @auth
-                                <li class="nav-item">
-                                    <a href="{{ url('/dashboard') }}" class="nav-link">Dashboard</a>
-                                </li>
-                            @else
-                                <li class="nav-item">
-                                    <a href="{{ url('/login') }}" class="nav-link">Login</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ url('/register') }}" class="nav-link">Register</a>
-                                </li> 
-                            @endauth
-                        @endif
-                    </ul> 
-                </div>
-                </div>
-            </nav>
-            <div class="row mt-5">
-                {{-- {{ auth()->user()->role }} --}}
-                @forelse ($data as $item)
-                    
-                    <div class="col-3">
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $item->title }}</h5> 
-                                <p>{{ $item->description }}</p>
-                                <span>Start Time : {{ $item->start_time }}</span>
-                                <span>End Time : {{ $item->end_time }}</span>
-                                <span>Capacity : {{ $item->capacity }}</span> 
-                            </div>
-                            <div class="card-footer">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial=1.0">
+    <title>Tenant Event Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: white;
+            color: #007bff;
+            text-align: center;
+        }
+        .navbar {
+            background: #00356d;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            transition: all 0.3s ease-in-out;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .nav-link:hover {
+            color: #ffcc00 !important;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #00438a, #008db6);
+            color: white;
+        }
+        .typing-text {
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .event-section {
+            background: #f8f9fa;
+            padding: 60px 0;
+        }
+        .event-card {
+            background: rgba(26, 28, 30, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky">
+        <div class="container">
+            <a class="navbar-brand" href="#">Event Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (Route::has('login'))
+                        @auth
+                            <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
+                        @else
+                            <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
+                        @endauth
+                    @endif 
+                    <li class="nav-item"><a class="nav-link" href="#events">Events</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container-fluid hero-section">
+        <h1 class="display-4 fw-bold">Welcome to Our Event Management Platform</h1>
+        <p class="typing-text" id="dynamicText"></p>
+        <a href="#events" class="btn btn-light btn-lg mt-3">View Events</a>
+    </div>
+    
+    <div class="container-fluid event-section" id="events">
+        <div class="container">
+            <h2 class="text-dark text-center mb-4">Upcoming Events</h2>
+            <div class="row">
+                @forelse($data as $item)
+                    <div class="col-md-4 mb-4">
+                        <div class="event-card p-4">
+                            <h4 class="card-title">{{ $item->title }}</h4>
+                            <p>{{ $item->description }}</p>
+                            <p><strong>Start Time:</strong> {{ $item->start_time }}</p>
+                            <p><strong>End Time:</strong> {{ $item->end_time }}</p>
+                            <p><strong>Capacity:</strong> {{ $item->capacity }}</p>
+                            <div class="card-footer text-center">
                                 @if($item->price)
-                                    
-                                    <a href="{{ route('bookings.create', $item->id) }}" class="btn btn-sm btn-info">Book Now</a>
-                                
+                                    <a href="{{ route('bookings.create', $item->id) }}" class="btn btn-info">Book Now</a>
                                 @else
-
-                                    <a href="{{ route('free.bookings.store', $item->id) }}" onclick="return confirm('Are you sure you want to book this event?')" class="btn btn-sm btn-info">Book Now</a>
-
+                                    <a href="{{ route('free.bookings.store', $item->id) }}" onclick="return confirm('Are you sure you want to book this event?')" class="btn btn-info">Book Now</a>
                                 @endif
                             </div>
                         </div>
                     </div>
-
                 @empty
-                    
+
+                    <div class="col-12 text-center">
+                        <p class="text-muted">No events available at the moment. Stay tuned for upcoming entertainment!</p>
+                    </div>
                 @endforelse
             </div>
         </div>
-            
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const text = "Bringing Entertainment to Life with Seamless Events.";
+        let index = 0;
+        let isDeleting = false;
 
-             
-     </body>
+        function typeEffect() {
+            const dynamicText = document.getElementById("dynamicText");
+            if (!isDeleting && index <= text.length) {
+                dynamicText.innerHTML = text.substring(0, index);
+                index++;
+            } else if (isDeleting && index >= 0) {
+                dynamicText.innerHTML = text.substring(0, index);
+                index--;
+            }
+            if (index === text.length) {
+                isDeleting = true;
+                setTimeout(typeEffect, 1000);
+            } else if (index === 0) {
+                isDeleting = false;
+                setTimeout(typeEffect, 500);
+            } else {
+                setTimeout(typeEffect, 100);
+            }
+        }
+        typeEffect();
+    </script>
+</body>
 </html>

@@ -10,10 +10,7 @@ use App\Http\Controllers\PaymentSettingController;
 use App\Http\Controllers\TenantRegisterController;
 use App\Http\Controllers\SubscriptionPlanController;
  
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
@@ -24,18 +21,24 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->middleware(['verified'])->name('dashboard');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::prefix('profile')->name('profile.')->group(function(){
+
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+     
+    });
+    
+    Route::prefix('payment-settings')->name('payment.settings.')->group(function(){
+
+        Route::get('/', [PaymentSettingController::class, 'index'])->name('index');
+        Route::put('/', [PaymentSettingController::class, 'update'])->name('update');
  
+    });
+
     Route::resource('subscription-plans', SubscriptionPlanController::class);
-    Route::get('tenant-index', [TenantController::class, 'index'])->name('tenants.index');
 
-    Route::get('/payment-settings', [PaymentSettingController::class, 'index'])->name('payment-settings.index');
-    Route::put('/payment-settings', [PaymentSettingController::class, 'update'])->name('payment-settings.update');
-
-    // Route::get('stripe/payment', [StripePaymentController::class, 'showPaymentForm'])->name('stripe.payment.form');
-    // Route::post('stripe/payment', [StripePaymentController::class, 'processPayment'])->name('stripe.payment');
+    Route::get('tenant-list', [TenantController::class, 'index'])->name('tenants.index');
 
 });
 

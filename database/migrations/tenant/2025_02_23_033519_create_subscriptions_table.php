@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('tenant_id');
             $table->unsignedBigInteger('plan_id');
             $table->enum('status', ['active', 'cancelled'])->default('active');
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->timestamps();
         });
     }

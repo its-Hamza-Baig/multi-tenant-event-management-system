@@ -1,86 +1,93 @@
-# Multi-Tenant Event Management System
+# Multi-Tenancy Event Management System
 
-This is a **Multi-Tenant Event Management System** built using **Laravel 10**. The project includes **Laravel Breeze** for authentication and supports multi-tenancy to manage events across different organizations. The project is built using **PHP 8.1**.
+## Overview
+This project is a multi-tenant event management system built with Laravel. It allows a super admin to manage tenants and subscriptions, while tenants can manage their events and users can book events.
 
-## Features
-- Multi-tenancy support for managing multiple organizations
-- User authentication with **Laravel Breeze**
-- Event creation, management, and tracking  
+## Main Domain Functionalities
+- **Super Admin Login**
+- **Create Subscription Plan**
+- **Add Payment Method Keys**
+- **View Tenants**
 
-## Requirements
+## Tenant Registration Process
+When a tenant registers on the main domain:
+1. Registers on the main domain.
+2. A separate domain is created for the tenant.
+3. Tenant's record is stored in the tenant database.
+4. Tenant subscribes to a package.
+5. Tenant adds payment method keys.
+6. Tenant can now create events.
 
-Make sure you have the following installed before proceeding:
+## Standard User Registration on Tenant Subdomain
+- View events of that tenant.
+- Book events by paying the price.
 
-- **PHP 8.1** or later
-- **Composer** (PHP dependency manager)
-- **Node.js & NPM ^v 18** (for frontend assets)
-- **MySQL** or any other supported database
+## Multi-Tenancy Explanation
+Multi-tenancy is an architecture in which multiple tenants (organizations or users) share the same application instance but have separate databases or schema configurations. Our system uses the **stancl/tenancy** package to achieve this.
 
-## Installation & Setup
+## How Multi-Tenancy Works in Our System
+- The super admin manages tenants from the main domain.
+- When a tenant registers, a separate domain is created for them.
+- Each tenant has its own database to keep data isolated.
+- Tenants manage their own events and users.
+- Standard users can register and book events on a tenant's subdomain.
 
-Follow these steps to set up the project on your local machine:
+## System Requirements
+- **PHP Version:** 8.1+
+- **Node.js Version:** 18+
+- **Composer:** Latest stable version
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/its-Hamza-Baig/multi-tenant-event-management-system.git
-cd multi-tenant-event-management-system
-```
+## Required Packages
+The following packages are used in this project:
+1. **Laravel Framework** - `laravel/framework ^10.10`
+2. **Multi-Tenancy** - `stancl/tenancy ^3.8`
+3. **Authentication** - `laravel/sanctum ^3.3`
+4. **Payments** - `stripe/stripe-php ^16.5`
+5. **HTTP Client** - `guzzlehttp/guzzle ^7.2`
+6. **Laravel Breeze** - `laravel/breeze ^1.29` (for authentication scaffolding)
 
-### 2. Install Dependencies
-```bash
-composer install
-```
+## Installation
+Follow these steps to set up the project:
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   ```
+2. Navigate to the project directory:
+   ```sh
+   cd multi-tenancy-event-system
+   ```
+3. Install dependencies:
+   ```sh
+   composer install
+   npm install && npm run dev
+   ```
+4. Set up the `.env` file:
+   ```sh
+   cp .env.example .env
+   ```
+   - Configure database and tenancy settings.
+5. Run migrations:
+   ```sh
+   php artisan migrate --seed
+   ```
+6. Start the development server:
+   ```sh
+   php artisan serve
+   ```
+7. Add these line and add the main database connection in it
 
-### 3. Copy Environment File
-```bash
-cp .env.example .env
-```
 
+DB_MAIN_CONNECTION=mysql
+DB_MAIN_HOST=127.0.0.1
+DB_MAIN_PORT=3306
+DB_MAIN_DATABASE=multi_tenant_event_management_system
+DB_MAIN_USERNAME=root
+DB_MAIN_PASSWORD=
 
-### 4. Configure Database
-Edit the `.env` file and update the following:
-```ini
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_database_user
-DB_PASSWORD=your_database_password
-```
+## Flow Chart Diagram
+![Image](https://github.com/user-attachments/assets/491c70b4-4b87-41e4-8f6b-0a72ba396993)
 
-### 5. Run Migrations
-```bash
-php artisan migrate
-```
- 
-Select **Blade** when prompted for the stack.
+## ERD Diagram
+![Image](https://github.com/user-attachments/assets/b3c2f950-14cb-4907-82fe-ba8c6d4bd2d9)
 
-### 6. Install NPM Dependencies & Build Frontend
-```bash
-npm install
-npm run dev
-```
-
-### 7. Seed Default Tenant & Users
-```bash
-php artisan db:seed
-```
-
-### 8. Serve the Application
-```bash
-php artisan serve
-```
-Visit **http://127.0.0.1:8000** in your browser to view the project.
- 
-
-## Authentication
-Laravel Breeze provides authentication out of the box. You can access the following routes:
-
-- **Login**: `/login`
-- **Register**: `/register`
-- **Dashboard (after login)**: `/dashboard`
- 
-
-### 🎉 You’re all set!
-Now you can start building your Multi-Tenant Event Management System with Breeze authentication. If you face any issues, check the Laravel documentation or open an issue in this repository.
 

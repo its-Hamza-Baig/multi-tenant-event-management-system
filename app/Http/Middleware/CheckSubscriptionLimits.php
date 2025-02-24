@@ -19,17 +19,8 @@ class CheckSubscriptionLimits
         $tenant = tenant();
         $subscription = $tenant->subscription;
 
-        if (!$subscription) {
-            return redirect()->route('dashboard')->with('error', 'You must subscribe to a plan.');
-        }
-
-        // Get event limits from plan
-        $plan = $subscription->plan;
-        $currentEventCount = Event::count(); // Count total events created by the tenant
-
-        // Check event limit
-        if ($currentEventCount >= $plan->event_limit) {
-            return redirect()->back()->with('error', 'Event creation limit reached.');
+        if (!$subscription || $subscription->plan->event_limit <= Event::count()) {
+            return redirect()->route('dashboard')->with('error', $subscription ? 'Event creation limit reached.' : 'You must subscribe to a plan.');
         }
 
         return $next($request);

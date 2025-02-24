@@ -17,23 +17,14 @@ class BookingController extends Controller
 {
     public function create($id)
     {
-        $data = Event::find($id);
-        $keys = PaymentSetting::first();
-
-        if(!$keys){
-            return redirect()->back()->with('error', 'Sorry, Payment settings not configured.');
-        }
-         
+        $data = Event::findOrFail($id);
         
-        $booked = Booking::where('event_id', $data->id)->count();
-         
-        $available = $data->capacity - $booked;
-        if($available == 0){
-            return redirect()->back()->with('error', 'Sorry, All the Seats are already reserved');
+        $keys = $this->getPaymentSettings();
+
+        if (!$this->checkAvailability($data)) {
+            return back()->with('error', 'Sorry, All the Seats are already reserved');
         }
-
-
-
+          
         return view('app.booking.create', compact('data', 'keys'));
     }
 
@@ -44,24 +35,21 @@ class BookingController extends Controller
             'event_id' => 'required'
         ]);
 
-        $event = Event::find($request->event_id);
+        $event = Event::findOrFail($request->event_id);
         
-        $booked = Booking::where('event_id', $request->event_id)->count();
-         
-        $available = $event->capacity - $booked;
-        if($available == 0){
-            return redirect()->back()->with('error', 'Sorry, All the Seats are already reserved');
+       
+        if (!$this->checkAvailability($event)) {
+            return back()->with('error', 'Sorry, All the Seats are already reserved');
         }
+        
+        $paymentSettings = $this->getPaymentSettings();
 
 
-        $paymentSettings = PaymentSetting::first();
-        if (!$paymentSettings) {
-            return redirect()->back()->with('error', 'Payment settings not configured.');
-        }
-
-        Stripe::setApiKey($paymentSettings->stripe_secret_key);
  
         try {
+
+            Stripe::setApiKey($paymentSettings->stripe_secret_key);
+
             $charge = Charge::create([
                 'amount' => $event->price * 100,  
                 'currency' => 'usd',
@@ -83,12 +71,12 @@ class BookingController extends Controller
 
     public function freeBooking($id)
     {
-        $booked = Booking::where('event_id', $id)->count();
-        $event = Event::find($id);
-        $available = $event->capacity - $booked;
-        if($available == 0){
-            return redirect()->back()->with('error', 'Sorry, All the Seats are already reserved');
+        $event = Event::findOrFail($id);
+       
+        if (!$this->checkAvailability($event)) {
+            return back()->with('error', 'Sorry, All the Seats are already reserved');
         }
+
         Booking::create([
             'user_id' => auth()->user()->id,
             'event_id' => $id
@@ -98,7 +86,22 @@ class BookingController extends Controller
 
     public function myBookings()
     {
-        $data = Booking::with('event')->where('user_id', auth()->user()->id)->get();
+        $data = Booking::with('event')->where('user_id', auth()->id)->get();
         return view('app.booking.index', compact('data'));
+    }
+
+    
+
+    private function getPaymentSettings()
+    {
+        $settings = PaymentSetting::first();
+        abort_if(!$settings, 500, 'Payment settings not configured.');
+        
+        return $settings;
+    }
+
+    private function checkAvailability(Event $event)
+    {
+        return $event->capacity > Booking::where('event_id', $event->id)->count();
     }
 }

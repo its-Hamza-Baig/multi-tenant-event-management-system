@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\SubscriptionPlan;
+use Illuminate\Database\QueryException;
 
 class SubscriptionPlanController extends Controller
 {
@@ -19,20 +21,19 @@ class SubscriptionPlanController extends Controller
         return view('plans.create');
     }
 
+    
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'event_limit' => 'required|integer|min:0',
-            'attendee_limit' => 'required|integer|min:0',
-            'seat_maps' => 'boolean',
-            'discount_codes' => 'boolean',
-        ]);
+        $validatedData = $this->validateRequest($request);
 
-        SubscriptionPlan::create($request->all());
-
-        return redirect()->route('subscription-plans.index')->with('success', 'Subscription Plan Created Successfully.');
+        try {
+            SubscriptionPlan::create($validatedData);
+            return redirect()->route('plans.index')->with('success', 'Subscription Plan Created Successfully.');
+        } catch (QueryException $e) {
+            return back()->with('error', 'Database error: Failed to create Subscription Plan.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An unexpected error occurred.');
+        }
     }
 
     public function show(SubscriptionPlan $subscriptionPlan)
@@ -46,26 +47,44 @@ class SubscriptionPlanController extends Controller
         return view('plans.edit', compact('subscriptionPlan'));
     }
 
+    
     public function update(Request $request, SubscriptionPlan $subscriptionPlan)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'event_limit' => 'nullable|integer|min:0',
-            'attendee_limit' => 'nullable|integer|min:0',
-            'seat_maps' => 'boolean',
-            'discount_codes' => 'boolean',
-        ]);
+        $validatedData = $this->validateRequest($request);
 
-        $subscriptionPlan->update($request->all());
-
-        return redirect()->route('subscription-plans.index')->with('success', 'Subscription Plan Updated Successfully.');
+        try {
+            $subscriptionPlan->update($validatedData);
+            return redirect()->route('plans.index')->with('success', 'Subscription Plan Updated Successfully.');
+        } catch (QueryException $e) {
+            return back()->with('error', 'Database error: Failed to update Subscription Plan.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An unexpected error occurred.');
+        }
     }
 
     public function destroy(SubscriptionPlan $subscriptionPlan)
     {
-        $subscriptionPlan->delete();
+        try {
+            $subscriptionPlan->delete();
+            return redirect()->route('plans.index')->with('success', 'Subscription Plan Deleted Successfully.');
+        } catch (QueryException $e) {
+            return back()->with('error', 'Database error: Failed to delete Subscription Plan.');
+        } catch (Exception $e) {
+            return back()->with('error', 'An unexpected error occurred.');
+        }
+    }
 
-        return redirect()->route('subscription-plans.index')->with('success', 'Subscription Plan Deleted Successfully.');
+
+
+    private function validateRequest(Request $request)
+    {
+        return $request->validate([
+            'name'            => 'required|string|max:255',
+            'price'           => 'required|numeric|min:0',
+            'event_limit'     => 'nullable|integer|min:0',
+            'attendee_limit'  => 'nullable|integer|min:0',
+            'seat_maps'       => 'boolean',
+            'discount_codes'  => 'boolean',
+        ]);
     }
 }
